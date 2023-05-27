@@ -35,7 +35,7 @@ package com.raywenderlich.android.jetnotes.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.raywenderlich.android.jetnotes.data.database.dao.ColorDao
 import com.raywenderlich.android.jetnotes.data.database.dao.NoteDao
 import com.raywenderlich.android.jetnotes.data.database.dbmapper.DbMapper
@@ -101,7 +101,7 @@ class RepositoryImpl(
   }
 
   override fun getNote(id: Long): LiveData<NoteModel> =
-    Transformations.map(noteDao.findById(id)) {
+    noteDao.findById(id).map {
       val colorDbModel = colorDao.findByIdSync(it.colorId)
       dbMapper.mapNote(it, colorDbModel)
     }
@@ -138,12 +138,12 @@ class RepositoryImpl(
   }
 
   override fun getAllColors(): LiveData<List<ColorModel>> =
-    Transformations.map(colorDao.getAll()) { dbMapper.mapColors(it) }
+    colorDao.getAll().map { dbMapper.mapColors(it) }
 
   override fun getAllColorsSync(): List<ColorModel> = dbMapper.mapColors(colorDao.getAllSync())
 
   override fun getColor(id: Long): LiveData<ColorModel> =
-    Transformations.map(colorDao.findById(id)) { dbMapper.mapColor(it) }
+    colorDao.findById(id).map { dbMapper.mapColor(it) }
 
   override fun getColorSync(id: Long): ColorModel = dbMapper.mapColor(colorDao.findByIdSync(id))
 
